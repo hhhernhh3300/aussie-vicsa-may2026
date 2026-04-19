@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Trip Expenses ✈️</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1b2a;--s1:#162436;--s2:#1c2f42;--accent:#e07b54;--gold:#d4a843;--blue:#4a90b8;--muted:#6d8499;--border:rgba(255,255,255,0.08);--text:#e4ddd4;--text2:#a0b8c8}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{max-width:480px;margin:0 auto;min-height:100vh;position:relative}
+.page{display:none;padding-bottom:90px}.page.active{display:block}
+.hero{padding:28px 20px 8px}
+.hero h1{font-family:'Playfair Display',serif;font-size:30px;line-height:1.2}
+.hero p{color:var(--muted);font-size:13px;margin-top:4px}
+.hdr{padding:18px 20px 0;display:flex;align-items:center;gap:10px}
+.back{background:var(--s2);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:8px 14px;cursor:pointer;font-size:13px;font-family:inherit}
+.hdr-title{font-family:'Playfair Display',serif;font-size:19px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.del-btn{background:none;border:1px solid rgba(224,84,84,.4);color:#e05454;border-radius:10px;padding:7px 12px;cursor:pointer;font-size:13px;font-family:inherit}
+.section{padding:14px 20px}
+.tcard{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.tcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);border-radius:18px 0 0 18px}
+.tcard:hover{background:var(--s2);transform:translateY(-1px)}
+.tcard-row{display:flex;justify-content:space-between;align-items:flex-start}
+.tcard h2{font-family:'Playfair Display',serif;font-size:19px}
+.tcard .dest{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:.8px;margin-top:3px}
+.tcard .meta{color:var(--muted);font-size:11px;margin-top:4px}
+.tcard-amounts{text-align:right}
+.tcard-amounts .main{font-size:21px;font-weight:700;color:var(--gold)}
+.tcard-amounts .home{font-size:12px;color:var(--muted);margin-top:2px}
+.tcard-amounts .cnt{font-size:11px;color:var(--muted);margin-top:1px}
+.tabs{display:flex;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:4px;margin:14px 20px 0}
+.tab{flex:1;padding:8px;text-align:center;border-radius:9px;font-size:13px;cursor:pointer;transition:all .2s;border:none;background:none;color:var(--muted);font-family:inherit}
+.tab.active{background:var(--s2);color:var(--text);font-weight:500}
+.tot-bar{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin:14px 20px 0}
+.tot-row{display:flex;justify-content:space-between;align-items:flex-start}
+.tot-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.tot-main{font-family:'Playfair Display',serif;font-size:30px;color:var(--gold)}
+.tot-home{font-size:13px;color:var(--muted);margin-top:4px}
+.rate-badge{font-size:10px;background:rgba(74,144,184,.15);color:var(--blue);border:1px solid rgba(74,144,184,.3);border-radius:6px;padding:3px 8px;margin-top:6px;display:inline-block}
+.tot-right{text-align:right;font-size:12px;color:var(--muted)}
+.tot-right span{display:block;margin-top:4px}
+.sum-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 20px 0}
+.sum-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px}
+.sum-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.sum-amt{font-size:15px;font-weight:600;color:var(--gold);margin-top:2px}
+.sum-home{font-size:10px;color:var(--muted);margin-top:1px}
+.prog{background:var(--s2);border-radius:3px;height:3px;margin-top:6px}
+.prog-fill{height:100%;border-radius:3px}
+.person-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 20px 0}
+.person-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px}
+.person-name{font-size:13px;font-weight:600}
+.person-amt{font-size:19px;font-weight:700;color:var(--accent);margin-top:4px}
+.person-home{font-size:11px;color:var(--muted)}
+.sec-hd{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 20px 0}
+.chips::-webkit-scrollbar{display:none}
+.chip{background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:12px;white-space:nowrap;cursor:pointer;font-family:inherit;color:var(--text2);transition:all .2s}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.exp-list{padding:12px 20px}
+.exp-item{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:8px;display:flex;gap:11px;align-items:flex-start}
+.exp-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.exp-body{flex:1;min-width:0}
+.exp-desc{font-size:14px;font-weight:500}
+.exp-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.exp-note{font-size:11px;color:var(--text2);margin-top:3px;font-style:italic}
+.exp-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.exp-amt{font-size:15px;font-weight:600}
+.exp-home{font-size:10px;color:var(--muted)}
+.exp-del{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0}
+.form-wrap{padding:16px 20px}
+.form-box{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:20px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field select option{background:#1c2f42}
+.field textarea{resize:none;height:64px}
+.frow{display:flex;gap:10px}
+.frow .field{flex:1}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cat-btn{background:var(--s2);border:2px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s;user-select:none}
+.cat-btn.active{border-color:var(--accent);background:rgba(224,123,84,.12)}
+.cat-icon{font-size:19px;display:block;margin-bottom:3px}
+.cat-lbl{font-size:10px;color:var(--muted)}
+.cat-btn.active .cat-lbl{color:var(--accent)}
+.rate-info{background:rgba(74,144,184,.08);border:1px solid rgba(74,144,184,.2);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:14px}
+.btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;margin-top:6px}
+.btn-primary:hover{background:#c96940}
+.fab{position:fixed;bottom:26px;right:50%;transform:translateX(calc(50% + 220px - 28px));width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(224,123,84,.4);display:flex;align-items:center;justify-content:center;z-index:100}
+@media(max-width:520px){.fab{right:20px;transform:none}}
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty .ei{font-size:38px;margin-bottom:8px}
+.empty p{font-size:13px}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#253647;border:1px solid var(--border);border-radius:20px;padding:9px 20px;font-size:13px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div id="page-home" class="page active">
+    <div class="hero"><h1>My Trips ✈️</h1><p id="home-sub">0 trips</p></div>
+    <div class="section" id="trip-list"></div>
+    <button class="fab" onclick="goAddTrip()">＋</button>
+  </div>
+
+  <div id="page-add-trip" class="page">
+    <div class="hdr">
+      <button class="back" onclick="show('page-home')">← Back</button>
+      <div class="hdr-title">New Trip</div>
+    </div>
+    <div class="form-wrap"><div class="form-box">
+      <div class="field"><label>Trip Name</label><input id="tf-name" placeholder="Melbourne Trip 🇦🇺"/></div>
+      <div class="field"><label>Destination</label><input id="tf-dest" placeholder="Melbourne, Australia"/></div>
+      <div class="field"><label>Travellers (comma-separated)</label><input id="tf-travs" placeholder="e.g. You, Brother"/></div>
+      <div class="frow">
+        <div class="field"><label>Start Date</label><input id="tf-s" type="date"/></div>
+        <div class="field"><label>End Date</label><input id="tf-e" type="date"/></div>
+      </div>
+      <div class="frow">
+        <div class="field"><label>Trip Currency</label><select id="tf-tc" onchange="updateRateLabel()"></select></div>
+        <div class="field"><label>Home Currency</label><select id="tf-hc" onchange="updateRateLabel()"></select></div>
+      </div>
+      <div class="field"><label id="tf-rl">Exchange Rate</label><input id="tf-r" type="number" step="0.0001" value="1.10"/></div>
+      <div class="rate-info" id="tf-ri">💱 Check xe.com for the latest AUD to SGD rate</div>
+      <button class="btn-primary" onclick="addTrip()">Create Trip →</button>
+    </div></div>
+  </div>
+
+  <div id="page-trip" class="page">
+    <div class="hdr">
+      <button class="back" onclick="show('page-home')">← Back</button>
+      <div class="hdr-title" id="trip-hdr"></div>
+      <button class="del-btn" onclick="delTrip()">🗑</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab-e" onclick="switchTab('e')">Expenses</button>
+      <button class="tab" id="tab-s" onclick="switchTab('s')">Summary</button>
+    </div>
+    <div class="tot-bar">
+      <div class="tot-row">
+        <div>
+          <div class="tot-label">Total Spent</div>
+          <div class="tot-main" id="t-main"></div>
+          <div class="tot-home" id="t-home"></div>
+          <div class="rate-badge" id="t-rate"></div>
+        </div>
+        <div class="tot-right" id="t-right"></div>
+      </div>
+    </div>
+    <div id="pane-e">
+      <div class="chips" id="chips"></div>
+      <div class="exp-list" id="exp-list"></div>
+    </div>
+    <div id="pane-s" style="display:none">
+      <div class="section" style="padding-bottom:0"><div class="sec-hd">By Category</div></div>
+      <div class="sum-grid" id="sum-grid"></div>
+      <div id="who-paid"></div>
+    </div>
+    <button class="fab" onclick="goAddExp()">＋</button>
+  </div>
+
+  <div id="page-add-expense" class="page">
+    <div class="hdr">
+      <button class="back" onclick="show('page-trip')">← Back</button>
+      <div class="hdr-title">Log Expense</div>
+    </div>
+    <div class="form-wrap"><div class="form-box">
+      <div class="field"><label>Category</label><div class="cat-grid" id="cat-grid"></div></div>
+      <div class="field"><label>Description</label><input id="ef-d" placeholder="e.g. Lunch at Queen Vic Market"/></div>
+      <div class="frow">
+        <div class="field"><label id="ef-al">Amount</label><input id="ef-a" type="number" placeholder="0.00" min="0" step="0.01" oninput="convUpdate()"/></div>
+        <div class="field"><label>Date</label><input id="ef-dt" type="date"/></div>
+      </div>
+      <div class="rate-info" id="ef-conv" style="display:none;margin-top:-6px"></div>
+      <div class="field" id="ef-pf" style="display:none"><label>Paid By</label><select id="ef-p"></select></div>
+      <div class="field"><label>Notes (optional)</label><textarea id="ef-n" placeholder="Any extra details..."></textarea></div>
+      <button class="btn-primary" onclick="addExpense()">Add Expense →</button>
+    </div></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='trip-v3';
+const CURR=['AUD','SGD','GBP','USD','EUR','JPY','HKD','CAD','NZD'];
+const SYM={AUD:'A$',SGD:'S$',GBP:'£',USD:'$',EUR:'€',JPY:'¥',HKD:'HK$',CAD:'C$',NZD:'NZ$'};
+const CATS=[
+  {id:'accommodation',label:'Accommodation',icon:'🏨',color:'#e07b54'},
+  {id:'food',label:'Food & Drink',icon:'🍜',color:'#d4a843'},
+  {id:'transport',label:'Transport',icon:'✈️',color:'#5b8fb9'},
+  {id:'activities',label:'Activities',icon:'🎭',color:'#7eb87e'},
+  {id:'shopping',label:'Shopping',icon:'🛍️',color:'#b57bb5'},
+  {id:'other',label:'Other',icon:'📦',color:'#9e9e9e'},
+];
+
+let DB=(()=>{try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):{trips:[],n:1}}catch{return{trips:[],n:1}}})();
+let tid=null,filter='all',ctab='e',cat='food';
+
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(DB))}catch{}};
+const fmt=(a,c)=>{const s=SYM[c]||c+' ';return c==='JPY'?s+Math.round(a).toLocaleString():s+Number(a).toFixed(2)};
+const conv=(a,t)=>a*(t.exchangeRate||1);
+const total=t=>t.expenses.reduce((s,e)=>s+e.amount,0);
+const catTot=(t,c)=>t.expenses.filter(e=>e.category===c).reduce((s,e)=>s+e.amount,0);
+const trip=()=>DB.trips.find(t=>t.id===tid);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const getCat=id=>CATS.find(c=>c.id===id)||CATS[5];
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+
+function show(pid){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(pid).classList.add('active');
+  if(pid==='page-home')renderHome();
+  if(pid==='page-trip')renderTrip();
+}
+
+// ── Currency selects ──
+function buildSelects(){
+  const opts=CURR.map(c=>`<option value="${c}">${c}</option>`).join('');
+  document.getElementById('tf-tc').innerHTML=opts;
+  document.getElementById('tf-hc').innerHTML=opts;
+  document.getElementById('tf-tc').value='AUD';
+  document.getElementById('tf-hc').value='SGD';
+  updateRateLabel();
+}
+function updateRateLabel(){
+  const tc=document.getElementById('tf-tc').value;
+  const hc=document.getElementById('tf-hc').value;
+  document.getElementById('tf-rl').textContent=`Exchange Rate (1 ${tc} = ? ${hc})`;
+  document.getElementById('tf-ri').textContent=`💱 Each expense will also show ≈ ${hc} · check xe.com for the latest rate`;
+}
+
+// ── Add trip ──
+function goAddTrip(){
+  document.getElementById('tf-name').value='Melbourne Trip 🇦🇺';
+  document.getElementById('tf-dest').value='Melbourne, Australia';
+  document.getElementById('tf-travs').value='';
+  document.getElementById('tf-s').value='';
+  document.getElementById('tf-e').value='';
+  document.getElementById('tf-r').value='1.10';
+  buildSelects();
+  show('page-add-trip');
+}
+function addTrip(){
+  const name=document.getElementById('tf-name').value.trim();
+  const dest=document.getElementById('tf-dest').value.trim();
+  if(!name||!dest){toast('Fill in trip name and destination');return}
+  DB.trips.push({id:DB.n++,name,destination:dest,
+    startDate:document.getElementById('tf-s').value,
+    endDate:document.getElementById('tf-e').value,
+    travellers:document.getElementById('tf-travs').value.trim(),
+    tripCurrency:document.getElementById('tf-tc').value,
+    homeCurrency:document.getElementById('tf-hc').value,
+    exchangeRate:parseFloat(document.getElementById('tf-r').value)||1,
+    expenses:[]});
+  save();toast('Trip created! ✈️');show('page-home');
+}
+
+// ── Delete trip ──
+function delTrip(){
+  if(!confirm('Delete this trip and all expenses?'))return;
+  DB.trips=DB.trips.filter(t=>t.id!==tid);
+  save();toast('Trip removed.');show('page-home');
+}
+
+// ── Open trip ──
+function openTrip(id){tid=id;filter='all';ctab='e';show('page-trip')}
+
+// ── Render home ──
+function renderHome(){
+  document.getElementById('home-sub').textContent=`${DB.trips.length} trip${DB.trips.length!==1?'s':''} · tap to explore`;
+  const el=document.getElementById('trip-list');
+  if(!DB.trips.length){el.innerHTML=`<div class="empty"><div class="ei">🗺️</div><p>No trips yet — tap <strong>+</strong> to begin!</p></div>`;return}
+  el.innerHTML=DB.trips.map(t=>`
+    <div class="tcard" onclick="openTrip(${t.id})">
+      <div class="tcard-row">
+        <div>
+          <h2>${esc(t.name)}</h2>
+          <div class="dest">📍 ${esc(t.destination)}</div>
+          ${t.startDate?`<div class="meta">📅 ${t.startDate}${t.endDate?' → '+t.endDate:''}</div>`:''}
+          ${t.travellers?`<div class="meta">👥 ${esc(t.travellers)}</div>`:''}
+        </div>
+        <div class="tcard-amounts">
+          <div class="main">${fmt(total(t),t.tripCurrency)}</div>
+          <div class="home">≈ ${fmt(conv(total(t),t),t.homeCurrency)}</div>
+          <div class="cnt">${t.expenses.length} expense${t.expenses.length!==1?'s':''}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Render trip ──
+function renderTrip(){
+  const t=trip();if(!t)return;
+  document.getElementById('trip-hdr').textContent=t.name;
+  const tot=total(t);
+  document.getElementById('t-main').textContent=fmt(tot,t.tripCurrency);
+  document.getElementById('t-home').textContent='≈ '+fmt(conv(tot,t),t.homeCurrency);
+  document.getElementById('t-rate').textContent=`💱 1 ${t.tripCurrency} = ${SYM[t.homeCurrency]||t.homeCurrency+' '}${Number(t.exchangeRate).toFixed(4)} ${t.homeCurrency}`;
+  document.getElementById('t-right').innerHTML=`<span>📍 ${esc(t.destination)}</span>${t.travellers?'<span>👥 '+esc(t.travellers)+'</span>':''}<span>${t.expenses.length} expense${t.expenses.length!==1?'s':''}</span>`;
+  switchTab(ctab);
+}
+
+function switchTab(tab){
+  ctab=tab;
+  document.getElementById('tab-e').classList.toggle('active',tab==='e');
+  document.getElementById('tab-s').classList.toggle('active',tab==='s');
+  document.getElementById('pane-e').style.display=tab==='e'?'':'none';
+  document.getElementById('pane-s').style.display=tab==='s'?'':'none';
+  if(tab==='e')renderExps();else renderSum();
+}
+
+function renderExps(){
+  const t=trip();if(!t)return;
+  const used=CATS.filter(c=>catTot(t,c.id)>0);
+  document.getElementById('chips').innerHTML=
+    `<button class="chip${filter==='all'?' active':''}" onclick="setFilter('all')">All</button>`+
+    used.map(c=>`<button class="chip${filter===c.id?' active':''}" onclick="setFilter('${c.id}')">${c.icon} ${c.label}</button>`).join('');
+  const exps=(filter==='all'?t.expenses:t.expenses.filter(e=>e.category===filter)).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('exp-list');
+  if(!exps.length){el.innerHTML=`<div class="empty"><div class="ei">🧾</div><p>No expenses yet — tap <strong>+</strong>!</p></div>`;return}
+  el.innerHTML=exps.map(exp=>{
+    const c=getCat(exp.category);
+    return `<div class="exp-item">
+      <div class="exp-ico" style="background:${c.color}22">${c.icon}</div>
+      <div class="exp-body">
+        <div class="exp-desc">${esc(exp.description)}</div>
+        <div class="exp-meta">${c.label} · ${exp.date}${exp.paidBy?' · 👤 '+esc(exp.paidBy):''}</div>
+        ${exp.notes?`<div class="exp-note">${esc(exp.notes)}</div>`:''}
+      </div>
+      <div class="exp-right">
+        <div class="exp-amt">${fmt(exp.amount,t.tripCurrency)}</div>
+        <div class="exp-home">≈ ${fmt(conv(exp.amount,t),t.homeCurrency)}</div>
+        <button class="exp-del" onclick="delExp(${exp.id})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(f){filter=f;renderExps()}
+
+function renderSum(){
+  const t=trip();if(!t)return;
+  const tot=total(t);
+  const used=CATS.filter(c=>catTot(t,c.id)>0);
+  document.getElementById('sum-grid').innerHTML=used.length?used.map(c=>{
+    const a=catTot(t,c.id),pct=tot>0?a/tot*100:0;
+    return `<div class="sum-card"><div style="font-size:17px">${c.icon}</div><div class="sum-lbl">${c.label}</div><div class="sum-amt">${fmt(a,t.tripCurrency)}</div><div class="sum-home">≈ ${fmt(conv(a,t),t.homeCurrency)}</div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:${c.color}"></div></div></div>`;
+  }).join(''):`<div style="grid-column:1/-1" class="empty"><div class="ei">📊</div><p>Log expenses to see breakdown</p></div>`;
+  const travs=t.travellers?t.travellers.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const wp=document.getElementById('who-paid');
+  wp.innerHTML=travs.length?`<div class="section" style="padding-bottom:0;padding-top:16px"><div class="sec-hd">Who Paid</div></div><div class="person-grid">${travs.map(name=>{const a=t.expenses.filter(e=>e.paidBy===name).reduce((s,e)=>s+e.amount,0);return `<div class="person-card"><div class="person-name">👤 ${esc(name)}</div><div class="person-amt">${fmt(a,t.tripCurrency)}</div><div class="person-home">≈ ${fmt(conv(a,t),t.homeCurrency)}</div></div>`}).join('')}</div>`:''
+}
+
+// ── Add expense ──
+function goAddExp(){
+  const t=trip();if(!t)return;
+  document.getElementById('ef-al').textContent=`Amount (${t.tripCurrency})`;
+  document.getElementById('ef-dt').value=new Date().toISOString().split('T')[0];
+  document.getElementById('ef-a').value='';
+  document.getElementById('ef-d').value='';
+  document.getElementById('ef-n').value='';
+  document.getElementById('ef-conv').style.display='none';
+  cat='food';
+  document.getElementById('cat-grid').innerHTML=CATS.map(c=>`<div class="cat-btn${c.id==='food'?' active':''}" onclick="selCat('${c.id}',this)"><span class="cat-icon">${c.icon}</span><span class="cat-lbl">${c.label}</span></div>`).join('');
+  const travs=t.travellers?t.travellers.split(',').map(s=>s.trim()).filter(Boolean):[];
+  const pf=document.getElementById('ef-pf'),ps=document.getElementById('ef-p');
+  if(travs.length){pf.style.display='';ps.innerHTML=`<option value="">— select —</option>`+travs.map(n=>`<option value="${n}">${n}</option>`).join('')+`<option value="Split">Split equally</option>`;ps.value=travs[0]||''}
+  else pf.style.display='none';
+  show('page-add-expense');
+}
+function selCat(id,el){cat=id;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active')}
+function convUpdate(){
+  const t=trip();if(!t)return;
+  const a=parseFloat(document.getElementById('ef-a').value)||0;
+  const c=document.getElementById('ef-conv');
+  if(a>0){c.style.display='';c.textContent=`≈ ${fmt(conv(a,t),t.homeCurrency)} back home`}else c.style.display='none';
+}
+function addExpense(){
+  const desc=document.getElementById('ef-d').value.trim();
+  const amt=parseFloat(document.getElementById('ef-a').value);
+  const date=document.getElementById('ef-dt').value;
+  if(!desc||!amt||!date){toast('Fill in description, amount and date');return}
+  const t=trip();if(!t)return;
+  t.expenses.push({id:Date.now(),description:desc,amount:amt,category:cat,date,notes:document.getElementById('ef-n').value.trim(),paidBy:document.getElementById('ef-p').value||''});
+  save();toast('Expense logged!');show('page-trip');
+}
+function delExp(id){
+  const t=trip();if(!t)return;
+  t.expenses=t.expenses.filter(e=>e.id!==id);
+  save();renderExps();toast('Removed.');
+}
+
+renderHome();
+</script>
+</body>
+</html>
