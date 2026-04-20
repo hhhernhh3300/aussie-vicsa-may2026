@@ -3,21 +3,31 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Trip Itinerary ✈️</title>
+<title>Koay Aussie Trip ✈️</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d1b2a;--s1:#162436;--s2:#1c2f42;--accent:#e07b54;--gold:#d4a843;--blue:#4a90b8;--muted:#6d8499;--border:rgba(255,255,255,0.08);--text:#e4ddd4;--text2:#a0b8c8}
+:root{--bg:#0d1b2a;--s1:#162436;--s2:#1c2f42;--accent:#e07b54;--gold:#d4a843;--blue:#4a90b8;--muted:#6d8499;--border:rgba(255,255,255,0.08);--text:#e4ddd4;--text2:#a0b8c8;--green:#4caf7d;--red:#e05454}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.app{max-width:480px;margin:0 auto;min-height:100vh;position:relative}
+.app{max-width:480px;margin:0 auto;min-height:100vh}
 .page{display:none;padding-bottom:90px}.page.active{display:block}
-.hero{padding:28px 20px 8px}
-.hero h1{font-family:'Playfair Display',serif;font-size:30px;line-height:1.2}
+
+/* Sync bar */
+.sync-bar{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:10px 20px 0}
+.sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sync-dot.ok{background:var(--green)}
+.sync-dot.loading{background:var(--gold);animation:pulse 1s infinite}
+.sync-dot.err{background:var(--red)}
+.sync-lbl{font-size:11px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.hero{padding:16px 20px 8px}
+.hero h1{font-family:'Playfair Display',serif;font-size:28px;line-height:1.2}
 .hero p{color:var(--muted);font-size:13px;margin-top:4px}
 .hdr{padding:18px 20px 0;display:flex;align-items:center;gap:10px}
 .back{background:var(--s2);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:8px 14px;cursor:pointer;font-size:13px;font-family:inherit}
 .hdr-title{font-family:'Playfair Display',serif;font-size:19px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.del-btn{background:none;border:1px solid rgba(224,84,84,.4);color:#e05454;border-radius:10px;padding:7px 12px;cursor:pointer;font-size:13px;font-family:inherit}
+.del-btn{background:none;border:1px solid rgba(224,84,84,.4);color:var(--red);border-radius:10px;padding:7px 12px;cursor:pointer;font-size:13px;font-family:inherit}
 .section{padding:14px 20px}
 .tcard{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
 .tcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent);border-radius:18px 0 0 18px}
@@ -69,6 +79,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .exp-amt{font-size:15px;font-weight:600}
 .exp-home{font-size:10px;color:var(--muted)}
 .exp-del{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0}
+.exp-del:hover{color:var(--red)}
 .form-wrap{padding:16px 20px}
 .form-box{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:20px}
 .field{margin-bottom:14px}
@@ -86,26 +97,43 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .cat-lbl{font-size:10px;color:var(--muted)}
 .cat-btn.active .cat-lbl{color:var(--accent)}
 .rate-info{background:rgba(74,144,184,.08);border:1px solid rgba(74,144,184,.2);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:14px}
-.btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;margin-top:6px}
+.btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;margin-top:6px;transition:background .2s}
 .btn-primary:hover{background:#c96940}
+.btn-primary:disabled{background:var(--muted);cursor:not-allowed}
 .fab{position:fixed;bottom:26px;right:50%;transform:translateX(calc(50% + 220px - 28px));width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(224,123,84,.4);display:flex;align-items:center;justify-content:center;z-index:100}
 @media(max-width:520px){.fab{right:20px;transform:none}}
 .empty{text-align:center;padding:36px 20px;color:var(--muted)}
 .empty .ei{font-size:38px;margin-bottom:8px}
 .empty p{font-size:13px}
-.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#253647;border:1px solid var(--border);border-radius:20px;padding:9px 20px;font-size:13px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#253647;border:1px solid var(--border);border-radius:20px;padding:9px 20px;font-size:13px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
 .toast.show{opacity:1}
+.loading-overlay{position:fixed;inset:0;background:rgba(13,27,42,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
+.loading-overlay p{font-size:14px;color:var(--text2)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <div id="page-home" class="page active">
-    <div class="hero"><h1>My Trips ✈️</h1><p id="home-sub">0 trips</p></div>
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <p>Connecting to shared trip data...</p>
+  </div>
+
+  <!-- PAGE: HOME -->
+  <div id="page-home" class="page">
+    <div class="sync-bar">
+      <div class="sync-dot loading" id="sync-dot"></div>
+      <span class="sync-lbl" id="sync-lbl" style="color:var(--gold)">Syncing...</span>
+    </div>
+    <div class="hero"><h1>Koay Aussie Trip ✈️</h1><p id="home-sub">Loading...</p></div>
     <div class="section" id="trip-list"></div>
     <button class="fab" onclick="goAddTrip()">＋</button>
   </div>
 
+  <!-- PAGE: ADD TRIP -->
   <div id="page-add-trip" class="page">
     <div class="hdr">
       <button class="back" onclick="show('page-home')">← Back</button>
@@ -114,7 +142,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="form-wrap"><div class="form-box">
       <div class="field"><label>Trip Name</label><input id="tf-name" placeholder="Melbourne Trip 🇦🇺"/></div>
       <div class="field"><label>Destination</label><input id="tf-dest" placeholder="Melbourne, Australia"/></div>
-      <div class="field"><label>Travellers (comma-separated)</label><input id="tf-travs" placeholder="e.g. You, Brother"/></div>
+      <div class="field"><label>Travellers (comma-separated)</label><input id="tf-travs" placeholder="e.g. Koay, Brother"/></div>
       <div class="frow">
         <div class="field"><label>Start Date</label><input id="tf-s" type="date"/></div>
         <div class="field"><label>End Date</label><input id="tf-e" type="date"/></div>
@@ -123,12 +151,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="field"><label>Trip Currency</label><select id="tf-tc" onchange="updateRateLabel()"></select></div>
         <div class="field"><label>Home Currency</label><select id="tf-hc" onchange="updateRateLabel()"></select></div>
       </div>
-      <div class="field"><label id="tf-rl">Exchange Rate</label><input id="tf-r" type="number" step="0.0001" value="1.10"/></div>
-      <div class="rate-info" id="tf-ri">💱 Check xe.com for the latest AUD to SGD rate</div>
-      <button class="btn-primary" onclick="addTrip()">Create Trip →</button>
+      <div class="field"><label id="tf-rl">Exchange Rate (1 AUD = ? SGD)</label><input id="tf-r" type="number" step="0.0001" value="1.10"/></div>
+      <div class="rate-info" id="tf-ri">💱 Check xe.com for the latest AUD → SGD rate</div>
+      <button class="btn-primary" id="btn-create" onclick="addTrip()">Create Trip →</button>
     </div></div>
   </div>
 
+  <!-- PAGE: TRIP DETAIL -->
   <div id="page-trip" class="page">
     <div class="hdr">
       <button class="back" onclick="show('page-home')">← Back</button>
@@ -162,6 +191,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="fab" onclick="goAddExp()">＋</button>
   </div>
 
+  <!-- PAGE: ADD EXPENSE -->
   <div id="page-add-expense" class="page">
     <div class="hdr">
       <button class="back" onclick="show('page-trip')">← Back</button>
@@ -171,13 +201,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="field"><label>Category</label><div class="cat-grid" id="cat-grid"></div></div>
       <div class="field"><label>Description</label><input id="ef-d" placeholder="e.g. Lunch at Queen Vic Market"/></div>
       <div class="frow">
-        <div class="field"><label id="ef-al">Amount</label><input id="ef-a" type="number" placeholder="0.00" min="0" step="0.01" oninput="convUpdate()"/></div>
+        <div class="field"><label id="ef-al">Amount (AUD)</label><input id="ef-a" type="number" placeholder="0.00" min="0" step="0.01" oninput="convUpdate()"/></div>
         <div class="field"><label>Date</label><input id="ef-dt" type="date"/></div>
       </div>
       <div class="rate-info" id="ef-conv" style="display:none;margin-top:-6px"></div>
       <div class="field" id="ef-pf" style="display:none"><label>Paid By</label><select id="ef-p"></select></div>
       <div class="field"><label>Notes (optional)</label><textarea id="ef-n" placeholder="Any extra details..."></textarea></div>
-      <button class="btn-primary" onclick="addExpense()">Add Expense →</button>
+      <button class="btn-primary" id="btn-add-exp" onclick="addExpense()">Add Expense →</button>
     </div></div>
   </div>
 
@@ -185,7 +215,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY='trip-v3';
+// ── JSONBin config ──────────────────────────────────────────────
+const BIN_ID  = '69e5d5cb36566621a8d068d7';
+const API_KEY = '$2a$10$GOYcVLNBr73Y3rXng5nzAuwvg8Tg.boeei4zfiLfCfb64heLG5gWC';
+const BASE    = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const HEADERS = { 'Content-Type':'application/json', 'X-Master-Key': API_KEY };
+
+// ── Constants ──────────────────────────────────────────────────
 const CURR=['AUD','SGD','GBP','USD','EUR','JPY','HKD','CAD','NZD'];
 const SYM={AUD:'A$',SGD:'S$',GBP:'£',USD:'$',EUR:'€',JPY:'¥',HKD:'HK$',CAD:'C$',NZD:'NZ$'};
 const CATS=[
@@ -197,20 +233,98 @@ const CATS=[
   {id:'other',label:'Other',icon:'📦',color:'#9e9e9e'},
 ];
 
-let DB=(()=>{try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):{trips:[],n:1}}catch{return{trips:[],n:1}}})();
-let tid=null,filter='all',ctab='e',cat='food';
+// ── State ──────────────────────────────────────────────────────
+let DB = {trips:[],n:1};
+let tid=null, filter='all', ctab='e', cat='food';
+let pollTimer=null;
 
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(DB))}catch{}};
+// ── Helpers ────────────────────────────────────────────────────
 const fmt=(a,c)=>{const s=SYM[c]||c+' ';return c==='JPY'?s+Math.round(a).toLocaleString():s+Number(a).toFixed(2)};
 const conv=(a,t)=>a*(t.exchangeRate||1);
 const total=t=>t.expenses.reduce((s,e)=>s+e.amount,0);
 const catTot=(t,c)=>t.expenses.filter(e=>e.category===c).reduce((s,e)=>s+e.amount,0);
 const trip=()=>DB.trips.find(t=>t.id===tid);
-const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const getCat=id=>CATS.find(c=>c.id===id)||CATS[5];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
 
+function setSyncStatus(status){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-lbl');
+  dot.className='sync-dot '+status;
+  if(status==='ok'){lbl.textContent='Live synced ✓';lbl.style.color='#4caf7d'}
+  else if(status==='loading'){lbl.textContent='Syncing...';lbl.style.color='#d4a843'}
+  else{lbl.textContent='Sync error';lbl.style.color='#e05454'}
+}
+
+// ── JSONBin API ────────────────────────────────────────────────
+async function fetchDB(){
+  try {
+    const r=await fetch(BASE+'/latest',{headers:{'X-Master-Key':API_KEY}});
+    if(!r.ok)throw new Error();
+    const j=await r.json();
+    DB=j.record;
+    setSyncStatus('ok');
+    return true;
+  } catch {
+    setSyncStatus('err');
+    return false;
+  }
+}
+
+async function pushDB(){
+  setSyncStatus('loading');
+  try {
+    const r=await fetch(BASE,{method:'PUT',headers:HEADERS,body:JSON.stringify(DB)});
+    if(!r.ok)throw new Error();
+    setSyncStatus('ok');
+    return true;
+  } catch {
+    setSyncStatus('err');
+    toast('⚠️ Save failed — check connection');
+    return false;
+  }
+}
+
+// Poll every 10 seconds to catch other person's changes
+function startPolling(){
+  if(pollTimer)clearInterval(pollTimer);
+  pollTimer=setInterval(async()=>{
+    const before=JSON.stringify(DB);
+    await fetchDB();
+    const after=JSON.stringify(DB);
+    if(before!==after){
+      // Remote change detected — silently re-render current view
+      const activePage=document.querySelector('.page.active');
+      if(activePage){
+        if(activePage.id==='page-home')renderHome();
+        else if(activePage.id==='page-trip')renderTrip();
+      }
+    }
+  },10000);
+}
+
+// ── Init ───────────────────────────────────────────────────────
+async function init(){
+  document.getElementById('loading').style.display='flex';
+  const ok=await fetchDB();
+  document.getElementById('loading').style.display='none';
+  if(!ok){
+    document.getElementById('loading').innerHTML='<p style="color:#e05454;text-align:center;padding:20px">Could not connect.<br>Check your internet and reload.</p>';
+    document.getElementById('loading').style.display='flex';
+    return;
+  }
+  buildSelects();
+  show('page-home');
+  startPolling();
+}
+
+// ── Navigation ─────────────────────────────────────────────────
 function show(pid){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(pid).classList.add('active');
@@ -218,7 +332,7 @@ function show(pid){
   if(pid==='page-trip')renderTrip();
 }
 
-// ── Currency selects ──
+// ── Currency selects ───────────────────────────────────────────
 function buildSelects(){
   const opts=CURR.map(c=>`<option value="${c}">${c}</option>`).join('');
   document.getElementById('tf-tc').innerHTML=opts;
@@ -231,50 +345,17 @@ function updateRateLabel(){
   const tc=document.getElementById('tf-tc').value;
   const hc=document.getElementById('tf-hc').value;
   document.getElementById('tf-rl').textContent=`Exchange Rate (1 ${tc} = ? ${hc})`;
-  document.getElementById('tf-ri').textContent=`💱 Each expense will also show ≈ ${hc} · check xe.com for the latest rate`;
+  document.getElementById('tf-ri').textContent=`💱 Check xe.com for latest ${tc} → ${hc} rate`;
 }
 
-// ── Add trip ──
-function goAddTrip(){
-  document.getElementById('tf-name').value='Melbourne Trip 🇦🇺';
-  document.getElementById('tf-dest').value='Melbourne, Australia';
-  document.getElementById('tf-travs').value='';
-  document.getElementById('tf-s').value='';
-  document.getElementById('tf-e').value='';
-  document.getElementById('tf-r').value='1.10';
-  buildSelects();
-  show('page-add-trip');
-}
-function addTrip(){
-  const name=document.getElementById('tf-name').value.trim();
-  const dest=document.getElementById('tf-dest').value.trim();
-  if(!name||!dest){toast('Fill in trip name and destination');return}
-  DB.trips.push({id:DB.n++,name,destination:dest,
-    startDate:document.getElementById('tf-s').value,
-    endDate:document.getElementById('tf-e').value,
-    travellers:document.getElementById('tf-travs').value.trim(),
-    tripCurrency:document.getElementById('tf-tc').value,
-    homeCurrency:document.getElementById('tf-hc').value,
-    exchangeRate:parseFloat(document.getElementById('tf-r').value)||1,
-    expenses:[]});
-  save();toast('Trip created! ✈️');show('page-home');
-}
-
-// ── Delete trip ──
-function delTrip(){
-  if(!confirm('Delete this trip and all expenses?'))return;
-  DB.trips=DB.trips.filter(t=>t.id!==tid);
-  save();toast('Trip removed.');show('page-home');
-}
-
-// ── Open trip ──
-function openTrip(id){tid=id;filter='all';ctab='e';show('page-trip')}
-
-// ── Render home ──
+// ── Render home ────────────────────────────────────────────────
 function renderHome(){
-  document.getElementById('home-sub').textContent=`${DB.trips.length} trip${DB.trips.length!==1?'s':''} · tap to explore`;
+  document.getElementById('home-sub').textContent=`${DB.trips.length} trip${DB.trips.length!==1?'s':''} · shared between both of you`;
   const el=document.getElementById('trip-list');
-  if(!DB.trips.length){el.innerHTML=`<div class="empty"><div class="ei">🗺️</div><p>No trips yet — tap <strong>+</strong> to begin!</p></div>`;return}
+  if(!DB.trips.length){
+    el.innerHTML=`<div class="empty"><div class="ei">🗺️</div><p>No trips yet — tap <strong>+</strong> to begin!</p></div>`;
+    return;
+  }
   el.innerHTML=DB.trips.map(t=>`
     <div class="tcard" onclick="openTrip(${t.id})">
       <div class="tcard-row">
@@ -293,7 +374,52 @@ function renderHome(){
     </div>`).join('');
 }
 
-// ── Render trip ──
+// ── Add trip ───────────────────────────────────────────────────
+function goAddTrip(){
+  document.getElementById('tf-name').value='Melbourne Trip 🇦🇺';
+  document.getElementById('tf-dest').value='Melbourne, Australia';
+  document.getElementById('tf-travs').value='';
+  document.getElementById('tf-s').value='';
+  document.getElementById('tf-e').value='';
+  document.getElementById('tf-r').value='1.10';
+  buildSelects();
+  show('page-add-trip');
+}
+
+async function addTrip(){
+  const name=document.getElementById('tf-name').value.trim();
+  const dest=document.getElementById('tf-dest').value.trim();
+  if(!name||!dest){toast('Fill in trip name and destination');return}
+  const btn=document.getElementById('btn-create');
+  btn.disabled=true;btn.textContent='Saving...';
+  DB.trips.push({
+    id:DB.n++,name,destination:dest,
+    startDate:document.getElementById('tf-s').value,
+    endDate:document.getElementById('tf-e').value,
+    travellers:document.getElementById('tf-travs').value.trim(),
+    tripCurrency:document.getElementById('tf-tc').value,
+    homeCurrency:document.getElementById('tf-hc').value,
+    exchangeRate:parseFloat(document.getElementById('tf-r').value)||1,
+    expenses:[]
+  });
+  await pushDB();
+  btn.disabled=false;btn.textContent='Create Trip →';
+  toast('Trip created! ✈️');
+  show('page-home');
+}
+
+async function delTrip(){
+  if(!confirm('Delete this trip and all expenses?'))return;
+  DB.trips=DB.trips.filter(t=>t.id!==tid);
+  await pushDB();
+  toast('Trip removed.');
+  show('page-home');
+}
+
+// ── Open trip ──────────────────────────────────────────────────
+function openTrip(id){tid=id;filter='all';ctab='e';show('page-trip')}
+
+// ── Render trip ────────────────────────────────────────────────
 function renderTrip(){
   const t=trip();if(!t)return;
   document.getElementById('trip-hdr').textContent=t.name;
@@ -301,7 +427,10 @@ function renderTrip(){
   document.getElementById('t-main').textContent=fmt(tot,t.tripCurrency);
   document.getElementById('t-home').textContent='≈ '+fmt(conv(tot,t),t.homeCurrency);
   document.getElementById('t-rate').textContent=`💱 1 ${t.tripCurrency} = ${SYM[t.homeCurrency]||t.homeCurrency+' '}${Number(t.exchangeRate).toFixed(4)} ${t.homeCurrency}`;
-  document.getElementById('t-right').innerHTML=`<span>📍 ${esc(t.destination)}</span>${t.travellers?'<span>👥 '+esc(t.travellers)+'</span>':''}<span>${t.expenses.length} expense${t.expenses.length!==1?'s':''}</span>`;
+  document.getElementById('t-right').innerHTML=`
+    <span>📍 ${esc(t.destination)}</span>
+    ${t.travellers?`<span>👥 ${esc(t.travellers)}</span>`:''}
+    <span>${t.expenses.length} expense${t.expenses.length!==1?'s':''}</span>`;
   switchTab(ctab);
 }
 
@@ -320,9 +449,13 @@ function renderExps(){
   document.getElementById('chips').innerHTML=
     `<button class="chip${filter==='all'?' active':''}" onclick="setFilter('all')">All</button>`+
     used.map(c=>`<button class="chip${filter===c.id?' active':''}" onclick="setFilter('${c.id}')">${c.icon} ${c.label}</button>`).join('');
-  const exps=(filter==='all'?t.expenses:t.expenses.filter(e=>e.category===filter)).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const exps=(filter==='all'?t.expenses:t.expenses.filter(e=>e.category===filter))
+    .slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
   const el=document.getElementById('exp-list');
-  if(!exps.length){el.innerHTML=`<div class="empty"><div class="ei">🧾</div><p>No expenses yet — tap <strong>+</strong>!</p></div>`;return}
+  if(!exps.length){
+    el.innerHTML=`<div class="empty"><div class="ei">🧾</div><p>No expenses yet — tap <strong>+</strong>!</p></div>`;
+    return;
+  }
   el.innerHTML=exps.map(exp=>{
     const c=getCat(exp.category);
     return `<div class="exp-item">
@@ -347,16 +480,33 @@ function renderSum(){
   const t=trip();if(!t)return;
   const tot=total(t);
   const used=CATS.filter(c=>catTot(t,c.id)>0);
-  document.getElementById('sum-grid').innerHTML=used.length?used.map(c=>{
-    const a=catTot(t,c.id),pct=tot>0?a/tot*100:0;
-    return `<div class="sum-card"><div style="font-size:17px">${c.icon}</div><div class="sum-lbl">${c.label}</div><div class="sum-amt">${fmt(a,t.tripCurrency)}</div><div class="sum-home">≈ ${fmt(conv(a,t),t.homeCurrency)}</div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:${c.color}"></div></div></div>`;
-  }).join(''):`<div style="grid-column:1/-1" class="empty"><div class="ei">📊</div><p>Log expenses to see breakdown</p></div>`;
+  document.getElementById('sum-grid').innerHTML=used.length
+    ?used.map(c=>{
+        const a=catTot(t,c.id),pct=tot>0?a/tot*100:0;
+        return `<div class="sum-card">
+          <div style="font-size:17px">${c.icon}</div>
+          <div class="sum-lbl">${c.label}</div>
+          <div class="sum-amt">${fmt(a,t.tripCurrency)}</div>
+          <div class="sum-home">≈ ${fmt(conv(a,t),t.homeCurrency)}</div>
+          <div class="prog"><div class="prog-fill" style="width:${pct}%;background:${c.color}"></div></div>
+        </div>`;
+      }).join('')
+    :`<div style="grid-column:1/-1" class="empty"><div class="ei">📊</div><p>Log expenses to see breakdown</p></div>`;
   const travs=t.travellers?t.travellers.split(',').map(s=>s.trim()).filter(Boolean):[];
-  const wp=document.getElementById('who-paid');
-  wp.innerHTML=travs.length?`<div class="section" style="padding-bottom:0;padding-top:16px"><div class="sec-hd">Who Paid</div></div><div class="person-grid">${travs.map(name=>{const a=t.expenses.filter(e=>e.paidBy===name).reduce((s,e)=>s+e.amount,0);return `<div class="person-card"><div class="person-name">👤 ${esc(name)}</div><div class="person-amt">${fmt(a,t.tripCurrency)}</div><div class="person-home">≈ ${fmt(conv(a,t),t.homeCurrency)}</div></div>`}).join('')}</div>`:''
+  document.getElementById('who-paid').innerHTML=travs.length
+    ?`<div class="section" style="padding-bottom:0;padding-top:16px"><div class="sec-hd">Who Paid</div></div>
+      <div class="person-grid">${travs.map(name=>{
+        const a=t.expenses.filter(e=>e.paidBy===name).reduce((s,e)=>s+e.amount,0);
+        return `<div class="person-card">
+          <div class="person-name">👤 ${esc(name)}</div>
+          <div class="person-amt">${fmt(a,t.tripCurrency)}</div>
+          <div class="person-home">≈ ${fmt(conv(a,t),t.homeCurrency)}</div>
+        </div>`;
+      }).join('')}</div>`
+    :'';
 }
 
-// ── Add expense ──
+// ── Add expense ────────────────────────────────────────────────
 function goAddExp(){
   const t=trip();if(!t)return;
   document.getElementById('ef-al').textContent=`Amount (${t.tripCurrency})`;
@@ -366,36 +516,66 @@ function goAddExp(){
   document.getElementById('ef-n').value='';
   document.getElementById('ef-conv').style.display='none';
   cat='food';
-  document.getElementById('cat-grid').innerHTML=CATS.map(c=>`<div class="cat-btn${c.id==='food'?' active':''}" onclick="selCat('${c.id}',this)"><span class="cat-icon">${c.icon}</span><span class="cat-lbl">${c.label}</span></div>`).join('');
+  document.getElementById('cat-grid').innerHTML=CATS.map(c=>
+    `<div class="cat-btn${c.id==='food'?' active':''}" onclick="selCat('${c.id}',this)">
+      <span class="cat-icon">${c.icon}</span>
+      <span class="cat-lbl">${c.label}</span>
+    </div>`).join('');
   const travs=t.travellers?t.travellers.split(',').map(s=>s.trim()).filter(Boolean):[];
   const pf=document.getElementById('ef-pf'),ps=document.getElementById('ef-p');
-  if(travs.length){pf.style.display='';ps.innerHTML=`<option value="">— select —</option>`+travs.map(n=>`<option value="${n}">${n}</option>`).join('')+`<option value="Split">Split equally</option>`;ps.value=travs[0]||''}
-  else pf.style.display='none';
+  if(travs.length){
+    pf.style.display='';
+    ps.innerHTML=`<option value="">— select —</option>`+travs.map(n=>`<option value="${n}">${n}</option>`).join('')+`<option value="Split">Split equally</option>`;
+    ps.value=travs[0]||'';
+  } else {
+    pf.style.display='none';
+  }
   show('page-add-expense');
 }
-function selCat(id,el){cat=id;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active')}
+
+function selCat(id,el){
+  cat=id;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
 function convUpdate(){
   const t=trip();if(!t)return;
   const a=parseFloat(document.getElementById('ef-a').value)||0;
   const c=document.getElementById('ef-conv');
-  if(a>0){c.style.display='';c.textContent=`≈ ${fmt(conv(a,t),t.homeCurrency)} back home`}else c.style.display='none';
+  if(a>0){c.style.display='';c.textContent=`≈ ${fmt(conv(a,t),t.homeCurrency)} back home`}
+  else c.style.display='none';
 }
-function addExpense(){
+
+async function addExpense(){
   const desc=document.getElementById('ef-d').value.trim();
   const amt=parseFloat(document.getElementById('ef-a').value);
   const date=document.getElementById('ef-dt').value;
   if(!desc||!amt||!date){toast('Fill in description, amount and date');return}
   const t=trip();if(!t)return;
-  t.expenses.push({id:Date.now(),description:desc,amount:amt,category:cat,date,notes:document.getElementById('ef-n').value.trim(),paidBy:document.getElementById('ef-p').value||''});
-  save();toast('Expense logged!');show('page-trip');
-}
-function delExp(id){
-  const t=trip();if(!t)return;
-  t.expenses=t.expenses.filter(e=>e.id!==id);
-  save();renderExps();toast('Removed.');
+  const btn=document.getElementById('btn-add-exp');
+  btn.disabled=true;btn.textContent='Saving...';
+  t.expenses.push({
+    id:Date.now(),description:desc,amount:amt,category:cat,date,
+    notes:document.getElementById('ef-n').value.trim(),
+    paidBy:document.getElementById('ef-p').value||''
+  });
+  await pushDB();
+  btn.disabled=false;btn.textContent='Add Expense →';
+  toast('Expense logged! 🎉');
+  show('page-trip');
 }
 
-renderHome();
+async function delExp(id){
+  const t=trip();if(!t)return;
+  t.expenses=t.expenses.filter(e=>e.id!==id);
+  await pushDB();
+  renderExps();
+  toast('Removed.');
+}
+
+// ── Start ──────────────────────────────────────────────────────
+init();
 </script>
 </body>
 </html>
