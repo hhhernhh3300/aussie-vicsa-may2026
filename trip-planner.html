@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Koay Aussie Trip ✈️</title>
+<title>Trip Planner ✈️</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -202,7 +202,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="field"><label>Description</label><input id="ef-d" placeholder="e.g. Lunch at Queen Vic Market"/></div>
       <div class="frow">
         <div class="field"><label id="ef-al">Amount (AUD)</label><input id="ef-a" type="number" placeholder="0.00" min="0" step="0.01" oninput="convUpdate()"/></div>
-        <div class="field"><label>Date</label><input id="ef-dt" type="date"/></div>
+        <div class="field"><label>Start Date</label><input id="ef-dt" type="date"/></div>
+        <div class="field"><label>End Date</label><input id="ef-dt" type="date"/></div>
       </div>
       <div class="rate-info" id="ef-conv" style="display:none;margin-top:-6px"></div>
       <div class="field" id="ef-pf" style="display:none"><label>Paid By</label><select id="ef-p"></select></div>
